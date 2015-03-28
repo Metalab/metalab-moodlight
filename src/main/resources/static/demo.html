@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>jscolor demo</title>
+</head>
+<body>
+
+	<script type="text/javascript" src="jscolor.js"></script>
+
+	Click here:
+	<input class="color" value="66ff00"
+		onchange="javascript:color_change(this.value)">
+
+	<script type="text/javascript">
+		function color_change(color) {
+			console.log(arguments[0]);
+		}
+	</script>
+
+</body>
+</html>
