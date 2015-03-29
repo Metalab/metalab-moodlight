@@ -34,6 +34,9 @@
 			new_uri += "//" + loc.host + "/set_color/" + color;
 			
 			document.getElementById('colorlink').href = new_uri;
+			
+			var strColor = '#' + color;
+			document.getElementById('colorlink').innerHTML = strColor.toUpperCase();
 			colorpicker.websocket.send(color);
 		}
 
