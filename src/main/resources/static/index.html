@@ -6,27 +6,34 @@
 
 	<script type="text/javascript" src="jscolor.js"></script>
 
-	Click here:
+	Color:
 	<input id="colorpicker"
-		class="color {onImmediateChange:'send_color_change(this);'}"
+		class="color { pickerOnfocus:false, onImmediateChange:'send_color_change(this);' }"
 		value="000000" >
+
+	<a id="colorlink" target="_blank" href="">Link for this color</a>
 
 	<script type="text/javascript">
 		window.addEventListener("load", init, false);
 
 		colorpicker = {
-			send_color : function(color) {
-				colorpicker.websocket.send(color);
-			},
 			websocket : null
 		};
 
 		function init() {
 			console.log('init called');
 			colorWebSocket();
+			
+			document.getElementById('colorpicker').color.showPicker();
 		}
 
 		function send_color_change(color) {
+			var loc = window.location;
+			var new_uri;
+			new_uri = loc.protocol;
+			new_uri += "//" + loc.host + "/set_color/" + color;
+			
+			document.getElementById('colorlink').href = new_uri;
 			colorpicker.websocket.send(color);
 		}
 

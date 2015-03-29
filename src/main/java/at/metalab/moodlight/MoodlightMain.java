@@ -1,12 +1,18 @@
 package at.metalab.moodlight;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.ServerContainer;
 
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -33,6 +39,22 @@ public class MoodlightMain {
 		ColorSocket.setPath(args[0]);
 		LOG.info(String.format("using set_color in %s", args[0]));
 
+		ContextHandler setColor = new ContextHandler("/set_color/") {
+			@Override
+			public void doHandle(String arg0, Request arg1,
+					HttpServletRequest arg2, HttpServletResponse arg3)
+					throws IOException, ServletException {
+				arg1.setHandled(true);
+				arg3.setStatus(200);
+				arg3.setContentType("text/plain");
+				arg3.setCharacterEncoding("UTF-8");
+				arg3.getWriter().write("ok");
+
+				ColorSocket.setColor(arg0.substring(1));
+
+				arg3.flushBuffer();
+			}
+		};
 		try {
 			ServerContainer wscontainer = WebSocketServerContainerInitializer
 					.configureContext(servletContext);
@@ -48,7 +70,7 @@ public class MoodlightMain {
 					.newClassPathResource("static"));
 
 			HandlerList handlers = new HandlerList();
-			handlers.setHandlers(new Handler[] { servletContext,
+			handlers.setHandlers(new Handler[] { servletContext, setColor,
 					resourceHandler });
 			server.setHandler(handlers);
 

@@ -36,17 +36,21 @@ public class ColorSocket {
 
 	@OnMessage
 	public void onWebSocketText(Session session, String message) {
-		int r = Integer.valueOf(message.substring(0, 2), 16);
-		int g = Integer.valueOf(message.substring(2, 4), 16);
-		int b = Integer.valueOf(message.substring(4, 6), 16);
-
-		LOG.info(String.format("receive color: %s -> r=%d, g=%d, b=%d",
-				message, r, g, b));
-
-		setColor(r, g, b);
+		setColor(message);
 	}
 
 	private static long lastUpdate = System.currentTimeMillis();
+
+	public static void setColor(String color) {
+		int r = Integer.valueOf(color.substring(0, 2), 16);
+		int g = Integer.valueOf(color.substring(2, 4), 16);
+		int b = Integer.valueOf(color.substring(4, 6), 16);
+
+		LOG.info(String.format("received color: %s -> r=%d, g=%d, b=%d", color,
+				r, g, b));
+
+		setColor(r, g, b);
+	}
 
 	public static synchronized void setColor(int r, int g, int b) {
 		LOG.info(String.format("setColor: r=%d, g=%d, b=%d", r, g, b));
