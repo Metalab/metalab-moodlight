@@ -36,23 +36,31 @@ public class ColorSocket {
 
 	@OnMessage
 	public void onWebSocketText(Session session, String message) {
-		String r = String.valueOf(Integer.valueOf(message.substring(0, 2), 16));
-		String g = String.valueOf(Integer.valueOf(message.substring(2, 4), 16));
-		String b = String.valueOf(Integer.valueOf(message.substring(4, 6), 16));
+		int r = Integer.valueOf(message.substring(0, 2), 16);
+		int g = Integer.valueOf(message.substring(2, 4), 16);
+		int b = Integer.valueOf(message.substring(4, 6), 16);
 
-		LOG.info(String.format("receive color: %s -> r=%s, g=%s, b=%s",
+		LOG.info(String.format("receive color: %s -> r=%d, g=%d, b=%d",
 				message, r, g, b));
 
 		setColor(r, g, b);
 	}
 
-	public static synchronized void setColor(String r, String g, String b) {
-		LOG.info(String.format("setColor: r=%s, g=%s, b=%s", r, g, b));
+	private static long lastUpdate = System.currentTimeMillis();
+
+	public static synchronized void setColor(int r, int g, int b) {
+		LOG.info(String.format("setColor: r=%d, g=%d, b=%d", r, g, b));
 
 		try {
+			if (System.currentTimeMillis() - lastUpdate < 500) {
+				return;
+			}
+			lastUpdate = System.currentTimeMillis();
+
 			Process p = Runtime.getRuntime().exec(
-					new String[] { "./set_color", r, g, b }, new String[] {},
-					new File(path));
+					new String[] { "./set_color", String.valueOf(r),
+							String.valueOf(g), String.valueOf(b) },
+					new String[] {}, new File(path));
 			try {
 				LOG.info("set_color exited with rc = " + p.waitFor());
 			} catch (InterruptedException interruptedException) {

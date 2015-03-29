@@ -7,8 +7,9 @@
 	<script type="text/javascript" src="jscolor.js"></script>
 
 	Click here:
-	<input class="color" value="66ff00"
-		onchange="javascript:send_color_change(this.value)">
+	<input id="colorpicker"
+		class="color {onImmediateChange:'send_color_change(this);'}"
+		value="000000" >
 
 	<script type="text/javascript">
 		window.addEventListener("load", init, false);
@@ -26,7 +27,6 @@
 		}
 
 		function send_color_change(color) {
-			console.log('sending color: ' + color);
 			colorpicker.websocket.send(color);
 		}
 
@@ -44,16 +44,12 @@
 
 			var websocket = new WebSocket(wsUri);
 			websocket.onopen = function(evt) {
-				console.log("wscolor open!");
 			};
 			websocket.onclose = function(evt) {
-				console.log("wscolor close!");
 			};
 			websocket.onmessage = function(evt) {
-				console.log("wscolor onmessage!");
 			};
 			websocket.onerror = function(evt) {
-				console.log("wscolor onerror!");
 			};
 
 			colorpicker.websocket = websocket;
