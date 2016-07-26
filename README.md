@@ -1,2 +1,2 @@
 # metalab-moodlight
-control overflo's awesome usblinky in the lounge
+control overflo's awesome rgb ledstrip in the lounge
