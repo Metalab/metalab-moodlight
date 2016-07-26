@@ -28,6 +28,8 @@ public class ColorSocket {
 	private final static Set<Session> SESSIONS = Collections
 			.synchronizedSet(new HashSet<Session>());
 
+	public static MqttUnreliablePublisher mqttPub;
+	
 	@OnOpen
 	public void onWebSocketConnect(Session session) {
 		LOG.info("Socket Connected: " + session);
@@ -41,38 +43,13 @@ public class ColorSocket {
 
 	private static long lastUpdate = System.currentTimeMillis();
 
-	public static void setColor(String color) {
-		int r = Integer.valueOf(color.substring(0, 2), 16);
-		int g = Integer.valueOf(color.substring(2, 4), 16);
-		int b = Integer.valueOf(color.substring(4, 6), 16);
-
-		LOG.info(String.format("received color: %s -> r=%d, g=%d, b=%d", color,
-				r, g, b));
-
-		setColor(r, g, b);
-	}
-
-	public static synchronized void setColor(int r, int g, int b) {
-		LOG.info(String.format("setColor: r=%d, g=%d, b=%d", r, g, b));
-
-		try {
-			if (System.currentTimeMillis() - lastUpdate < 500) {
-				return;
-			}
-			lastUpdate = System.currentTimeMillis();
-
-			Process p = Runtime.getRuntime().exec(
-					new String[] { "./set_color", String.valueOf(r),
-							String.valueOf(g), String.valueOf(b) },
-					new String[] {}, new File(path));
-			try {
-				LOG.info("set_color exited with rc = " + p.waitFor());
-			} catch (InterruptedException interruptedException) {
-
-			}
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
+	public synchronized static void setColor(String color) {
+		if (System.currentTimeMillis() - lastUpdate < 500) {
+			return;
 		}
+		lastUpdate = System.currentTimeMillis();
+
+		mqttPub.publish(color);
 	}
 
 	@OnClose

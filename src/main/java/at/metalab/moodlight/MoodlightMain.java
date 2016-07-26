@@ -1,6 +1,7 @@
 package at.metalab.moodlight;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -18,6 +19,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.fusesource.mqtt.client.MQTT;
 
 public class MoodlightMain {
 
@@ -25,6 +27,18 @@ public class MoodlightMain {
 			.getName());
 
 	public static void main(String[] args) throws Exception {
+		MQTT mqtt = new MQTT();
+		String mqttHost = "tcp://127.0.0.1:1883";
+
+		try {
+			mqtt.setHost(mqttHost);
+		} catch (URISyntaxException uriSyntaxException) {
+			LOG.severe("could not create mqtt object for: " + mqttHost);
+		}
+		
+		final MqttUnreliablePublisher mqttPub = new MqttUnreliablePublisher(mqtt, "ESP_RGB_1");
+		ColorSocket.mqttPub = mqttPub;
+		
 		Server server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8083);
