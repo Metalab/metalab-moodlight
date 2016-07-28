@@ -1,7 +1,5 @@
 package at.metalab.moodlight;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,16 +18,12 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/colors/")
 public class ColorSocket {
 
-	private static String path;
+	private final static Logger LOG = Logger.getLogger(ColorSocket.class.getName());
 
-	private final static Logger LOG = Logger.getLogger(ColorSocket.class
-			.getName());
-
-	private final static Set<Session> SESSIONS = Collections
-			.synchronizedSet(new HashSet<Session>());
+	private final static Set<Session> SESSIONS = Collections.synchronizedSet(new HashSet<Session>());
 
 	public static MqttUnreliablePublisher mqttPub;
-	
+
 	@OnOpen
 	public void onWebSocketConnect(Session session) {
 		LOG.info("Socket Connected: " + session);
@@ -45,10 +39,12 @@ public class ColorSocket {
 
 	public synchronized static void setColor(String color) {
 		if (System.currentTimeMillis() - lastUpdate < 500) {
+			LOG.finest("skipping color change: " + color);
 			return;
 		}
 		lastUpdate = System.currentTimeMillis();
 
+		LOG.finest("publishing new color: " + color);
 		mqttPub.publish(color);
 	}
 
@@ -61,9 +57,5 @@ public class ColorSocket {
 	@OnError
 	public void onWebSocketError(Throwable cause) {
 		cause.printStackTrace(System.err);
-	}
-
-	public static void setPath(String path) {
-		ColorSocket.path = path;
 	}
 }

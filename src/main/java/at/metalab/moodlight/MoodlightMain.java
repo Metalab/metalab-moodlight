@@ -23,40 +23,47 @@ import org.fusesource.mqtt.client.MQTT;
 
 public class MoodlightMain {
 
-	private final static Logger LOG = Logger.getLogger(MoodlightMain.class
-			.getName());
+	private final static Logger LOG = Logger.getLogger(MoodlightMain.class.getName());
 
 	public static void main(String[] args) throws Exception {
+		// if you want to override the host/port and or the
+		// topic to which the colors
+		// are sent you can set the following JVM System properties:
+		// -Dmoodlight.mqttHost=... (defaults to 127.0.0.1)
+		// -Dmoodlight.mqttPort=... (defaults to 1883)
+		// -Dmoodlight.mqttTopic=... (default to ESP_RGB_1)
+
 		MQTT mqtt = new MQTT();
-		String mqttHost = "tcp://127.0.0.1:1883";
+
+		String mqttHost = "tcp://" + System.getProperty("moodlight.mqttHost", "127.0.0.1") + ":"
+				+ System.getProperty("moodlight.mqttPort", "1883");
+
+		String mqttTopic = System.getProperty("moodlight.mqttTopic", "ESP_RGB_1");
+
+		LOG.info(String.format("Moodlight setting: using topic '%s' at '%s'", mqttHost, mqttTopic));
 
 		try {
 			mqtt.setHost(mqttHost);
 		} catch (URISyntaxException uriSyntaxException) {
 			LOG.severe("could not create mqtt object for: " + mqttHost);
 		}
-		
-		final MqttUnreliablePublisher mqttPub = new MqttUnreliablePublisher(mqtt, "ESP_RGB_1");
+
+		final MqttUnreliablePublisher mqttPub = new MqttUnreliablePublisher(mqtt, mqttTopic);
 		ColorSocket.mqttPub = mqttPub;
-		
+
 		Server server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8083);
 		server.addConnector(connector);
 		// Setup the basic application "context" for this application at "/"
 		// This is also known as the handler tree (in jetty speak)
-		ServletContextHandler servletContext = new ServletContextHandler(
-				ServletContextHandler.SESSIONS);
+		ServletContextHandler servletContext = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		servletContext.setContextPath("/websocket");
 		servletContext.setServer(server);
 
-		ColorSocket.setPath(args[0]);
-		LOG.info(String.format("using set_color in %s", args[0]));
-
 		ContextHandler setColor = new ContextHandler("/set_color/") {
 			@Override
-			public void doHandle(String arg0, Request arg1,
-					HttpServletRequest arg2, HttpServletResponse arg3)
+			public void doHandle(String arg0, Request arg1, HttpServletRequest arg2, HttpServletResponse arg3)
 					throws IOException, ServletException {
 				arg1.setHandled(true);
 				arg3.setStatus(200);
@@ -70,8 +77,7 @@ public class MoodlightMain {
 			}
 		};
 		try {
-			ServerContainer wscontainer = WebSocketServerContainerInitializer
-					.configureContext(servletContext);
+			ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(servletContext);
 			wscontainer.addEndpoint(ColorSocket.class);
 
 			// setup a resource handler to deliver the awesome slick web ui with
@@ -80,12 +86,10 @@ public class MoodlightMain {
 			ResourceHandler resourceHandler = new ResourceHandler();
 			resourceHandler.setDirectoriesListed(false);
 			resourceHandler.setWelcomeFiles(new String[] { "index.html" });
-			resourceHandler.setBaseResource(Resource
-					.newClassPathResource("static"));
+			resourceHandler.setBaseResource(Resource.newClassPathResource("static"));
 
 			HandlerList handlers = new HandlerList();
-			handlers.setHandlers(new Handler[] { servletContext, setColor,
-					resourceHandler });
+			handlers.setHandlers(new Handler[] { servletContext, setColor, resourceHandler });
 			server.setHandler(handlers);
 
 			server.start();
