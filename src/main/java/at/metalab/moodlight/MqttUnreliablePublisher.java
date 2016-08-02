@@ -44,7 +44,10 @@ public class MqttUnreliablePublisher {
 			LOG.info(String.format("sent '%s' to '%s/%s'", payload, mqtt
 					.getHost().toString(), topic));
 		} catch (UnsupportedEncodingException willNeverHappen) {
+			connection = null;
 		} catch (Exception exception) {
+			connection = null;
+			
 			LOG.severe(String.format("publishing '%s' at '%s/%s' failed: %s",
 					payload, mqtt.getHost().toString(), topic,
 					exception.getMessage()));
