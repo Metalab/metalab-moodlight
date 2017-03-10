@@ -2,15 +2,35 @@
 	<head>
 		<title>Moodlight color picker</title>
 	</head>
-<body>
+<body style="height:100%">
 	<script type="text/javascript" src="jscolor.js"></script>
 
-	LED-Strip<input id="colorpickerStrip" onchange="send_color_change('strip', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
-	Zumtobel<input id="colorpickerLeft" onchange="send_color_change('zumtobel', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
-
-	<br>
-	All the lights <input id="colorpickerAll" onchange="send_color_change('all', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
-
+	<div style="height:100%">
+		<table style="position: absolute; height: 100%; width: 100%;">
+			<tr>
+				<td>
+					LED-Strip
+					<br>
+					<input id="colorpickerStrip" onchange="send_color_change('strip', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Zumtobel
+					<br>
+					<input id="colorpickerLeft" onchange="send_color_change('zumtobel', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					All the lights
+					<br>
+					<input id="colorpickerAll" onchange="send_color_change('all', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+				</td>
+			</tr>
+		</table>
+	</div>
+	
 	<script type="text/javascript">
 		window.addEventListener("load", init, false);
 
