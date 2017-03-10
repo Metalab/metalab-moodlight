@@ -1,17 +1,15 @@
 <html>
-<head>
-<title>Moodlight color picker</title>
-</head>
+	<head>
+		<title>Moodlight color picker</title>
+	</head>
 <body>
-
 	<script type="text/javascript" src="jscolor.js"></script>
 
-	Color:
-	<input id="colorpicker"
-		class="color { pickerOnfocus:false, onImmediateChange:'send_color_change(this);' }"
-		value="000000" >
+	LED-Strip<input id="colorpickerStrip" onchange="send_color_change('strip', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+	Zumtobel<input id="colorpickerLeft" onchange="send_color_change('zumtobel', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
 
-	<a id="colorlink" target="_blank" href="">Link for this color</a>
+	<br>
+	All the lights <input id="colorpickerAll" onchange="send_color_change('all', this.jscolor)" value="000000" class="jscolor {width:101, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
 
 	<script type="text/javascript">
 		window.addEventListener("load", init, false);
@@ -23,21 +21,11 @@
 		function init() {
 			console.log('init called');
 			colorWebSocket();
-			
-			document.getElementById('colorpicker').color.showPicker();
 		}
 
-		function send_color_change(color) {
-			var loc = window.location;
-			var new_uri;
-			new_uri = loc.protocol;
-			new_uri += "//" + loc.host + "/set_color/" + color;
-			
-			document.getElementById('colorlink').href = new_uri;
-			
-			var strColor = '#' + color;
-			document.getElementById('colorlink').innerHTML = strColor.toUpperCase();
-			colorpicker.websocket.send(color);
+		function send_color_change(destination, color) {
+			console.log('sending ' + color + ' to ' + destination);
+			colorpicker.websocket.send(destination + ':' + color);
 		}
 
 		function colorWebSocket() {

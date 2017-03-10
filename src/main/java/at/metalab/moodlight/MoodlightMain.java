@@ -26,21 +26,14 @@ public class MoodlightMain {
 	private final static Logger LOG = Logger.getLogger(MoodlightMain.class.getName());
 
 	public static void main(String[] args) throws Exception {
-		// if you want to override the host/port and or the
-		// topic to which the colors
-		// are sent you can set the following JVM System properties:
-		// -Dmoodlight.mqttHost=... (defaults to 127.0.0.1)
-		// -Dmoodlight.mqttPort=... (defaults to 1883)
-		// -Dmoodlight.mqttTopic=... (default to ESP_RGB_1)
-
 		MQTT mqtt = new MQTT();
 
-		String mqttHost = "tcp://" + System.getProperty("moodlight.mqttHost", "127.0.0.1") + ":"
+		String mqttHost = "tcp://" + System.getProperty("moodlight.mqttHost", "10.20.30.96") + ":"
 				+ System.getProperty("moodlight.mqttPort", "1883");
 
-		String mqttTopic = System.getProperty("moodlight.mqttTopic", "ESP_RGB_1");
+		String mqttTopic = System.getProperty("moodlight.mqttTopic", "/lounge/rgb");
 
-		LOG.info(String.format("Moodlight setting: using topic '%s' at '%s'", mqttHost, mqttTopic));
+		LOG.info(String.format("LED-Strip setting: using topic '%s' at '%s'", mqttHost, mqttTopic));
 
 		try {
 			mqtt.setHost(mqttHost);
@@ -55,6 +48,7 @@ public class MoodlightMain {
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8083);
 		server.addConnector(connector);
+
 		// Setup the basic application "context" for this application at "/"
 		// This is also known as the handler tree (in jetty speak)
 		ServletContextHandler servletContext = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -76,6 +70,7 @@ public class MoodlightMain {
 				arg3.flushBuffer();
 			}
 		};
+
 		try {
 			ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(servletContext);
 			wscontainer.addEndpoint(ColorSocket.class);

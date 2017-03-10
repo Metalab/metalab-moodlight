@@ -37,15 +37,34 @@ public class ColorSocket {
 
 	private static long lastUpdate = System.currentTimeMillis();
 
-	public synchronized static void setColor(String color) {
+	public synchronized static void setColor(String colorCommand) {
 		if (System.currentTimeMillis() - lastUpdate < 500) {
-			LOG.finest("skipping color change: " + color);
+			LOG.finest("skipping color change: " + colorCommand);
 			return;
 		}
 		lastUpdate = System.currentTimeMillis();
 
-		LOG.finest("publishing new color: " + color);
-		mqttPub.publish(color);
+		LOG.finest("received new color: " + colorCommand);
+
+		String destination = colorCommand.substring(0, colorCommand.indexOf(':'));
+		String color = colorCommand.substring(colorCommand.indexOf(':') + 1);
+
+		if ("all".equals(destination) || "strip".equals(destination)) {
+			LOG.info("setting color '" + color + "' on led strip");
+			mqttPub.publish(color.toUpperCase());
+		}
+
+		if ("all".equals(destination) || "zumtobel".equals(destination)) {
+			LOG.info("setting color '" + color + "' on zumtobel");
+
+			String colorStr = "*" + color; // avoids changing the indices below :)
+
+			byte r = Integer.valueOf(colorStr.substring(1, 3), 16).byteValue();
+			byte g = Integer.valueOf(colorStr.substring(3, 5), 16).byteValue();
+			byte b = Integer.valueOf(colorStr.substring(5, 7), 16).byteValue();
+
+			ArtnetSender.send(r, g, b);
+		}
 	}
 
 	@OnClose

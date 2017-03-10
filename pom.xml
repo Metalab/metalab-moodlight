@@ -5,7 +5,7 @@
 
 	<groupId>at.metalab.moodlight</groupId>
 	<artifactId>moodlight-jar</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -34,6 +34,11 @@
 			<artifactId>mqtt-client</artifactId>
 			<version>${fusesource-mqtt.version}</version>
 		</dependency>		
+		<dependency>
+			<groupId>net.eliosoft</groupId>
+			<artifactId>artnet4j</artifactId>
+			<version>0002</version>
+		</dependency>
 		<!-- To write basic javax.websocket against -->
 		<dependency>
 			<groupId>javax.websocket</groupId>
