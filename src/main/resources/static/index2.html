@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<title>Moodlight color picker</title>
+	</head>
+<body style="height:50%">
+	<script type="text/javascript" src="jscolor.js"></script>
+
+	<div style="height:100%">
+		<table style="position: absolute; height: 50%; width: 100%;">
+			<tr>
+				<td>
+					<input id="colorpickerStrip"  type="button" onchange="send_color_change('strip', this.jscolor)" value="000000" class="jscolor {width:300, height:300, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+				</td>
+				<td>
+					<input id="colorpickerLeft" type="button" onchange="send_color_change('zumtobel', this.jscolor)" value="000000" class="jscolor {width:300, height:300, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+				</td>
+				<td>
+					<input id="colorpickerAll" type="button" onchange="send_color_change('all', this.jscolor)" value="000000" class="jscolor {width:300, height: 300, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000'}">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					LED-Strip
+				</td>
+				<td>
+					Zumtobel
+				</td>
+				<td>
+					All the lights
+				</td>
+			</tr>
+			<tr>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<script type="text/javascript">
+		window.addEventListener("load", init, false);
+
+		colorpicker = {
+			websocket : null
+		};
+
+		function init() {
+			console.log('init called');
+			colorWebSocket();
+		}
+
+		function send_color_change(destination, color) {
+			console.log('sending ' + color + ' to ' + destination);
+			colorpicker.websocket.send(destination + ':' + color);
+		}
+
+		function colorWebSocket() {
+			var loc = window.location;
+			var new_uri;
+			if (loc.protocol === "https:") {
+				new_uri = "wss:";
+			} else {
+				new_uri = "ws:";
+			}
+			new_uri += "//" + loc.host + "/websocket/colors/";
+
+			var wsUri = new_uri;
+
+			var websocket = new WebSocket(wsUri);
+			websocket.onopen = function(evt) {
+			};
+			websocket.onclose = function(evt) {
+			};
+			websocket.onmessage = function(evt) {
+			};
+			websocket.onerror = function(evt) {
+			};
+
+			colorpicker.websocket = websocket;
+		}
+	</script>
+
+</body>
+</html>
