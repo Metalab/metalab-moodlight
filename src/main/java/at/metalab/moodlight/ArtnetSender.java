@@ -8,6 +8,8 @@ public class ArtnetSender {
 
 	private static ArtNet artnet;
 	
+	private static int burstMode = Integer.valueOf(System.getProperty("moodlight.burstMode", "1"));
+	
 	static { 
 		ArtNetServer ans = new ArtNetServer(9999, ArtNetServer.DEFAULT_PORT);
 		
@@ -40,11 +42,13 @@ public class ArtnetSender {
 			return;
 		}
 		
-		try {
-			artnet.unicastPacket(packet, System.getProperty("artnetIP", "10.20.255.255"));
-		} catch (Throwable t) {
-			System.out.println("send-artnet failed: " + t);
-			t.printStackTrace(System.out);
+		for(int i = 0; i < burstMode; i++) {
+			try {
+				artnet.unicastPacket(packet, System.getProperty("artnetIP", "10.20.255.255"));
+			} catch (Throwable t) {
+				System.out.println("send-artnet failed: " + t);
+				t.printStackTrace(System.out);
+			}
 		}
 	}
 
